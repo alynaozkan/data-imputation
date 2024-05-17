@@ -1,0 +1,36 @@
+import pandas as pd
+
+datafile = pd.read_csv('/content/country_vaccination_stats.csv')
+
+datafile.head()
+
+datafile.shape
+datafile.info() #daily_vaccinations column has 60 missing index
+
+def fill_missing_vaccinations(datafile):
+
+    min_vaccinations = datafile.groupby('country')['daily_vaccinations'].min()
+
+
+    datafile['daily_vaccinations'] = datafile.apply(lambda row: min_vaccinations[row['country']] if pd.isna(row['daily_vaccinations']) else row['daily_vaccinations'], axis=1)
+
+
+    datafile['daily_vaccinations'].fillna(0, inplace=True)
+
+    return datafile
+
+
+datafile_filled = fill_missing_vaccinations(datafile)
+datafile.head()
+
+datafile_filled.to_csv('filled_dataset.csv', index=False)
+
+# converting the date column to datetime format
+datafile_last['date'] = pd.to_datetime(datafile_last['date'])
+
+#filtering
+vacc_01062021 = datafile_last[datafile_last['date'] == '2021-01-06']
+
+total_vacc_01062021 = vacc_01062021['daily_vaccinations'].sum()
+
+print(total_vacc_01062021)
